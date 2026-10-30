@@ -1,0 +1,56 @@
+diff --git a/gradle/build-logic/src/main/kotlin/ExtensionPlugin.kt b/gradle/build-logic/src/main/kotlin/ExtensionPlugin.kt
+index 79f2e8c1..eadc0c7f 100644
+--- a/gradle/build-logic/src/main/kotlin/ExtensionPlugin.kt
++++ b/gradle/build-logic/src/main/kotlin/ExtensionPlugin.kt
+@@ -186,6 +186,8 @@ class ExtensionPlugin : Plugin<Project> {
+                     "pkgName '$suffix' is invalid. Expected dot-separated alphanumeric segments (e.g. '$dirSuffix')."
+                 }
+                 it.defaultConfig.applicationIdSuffix = suffix
++                // WeAre!: pacote próprio (-Pweare.pacote=app.weare.extension) para não colidir com a assinatura da Keiyoushi.
++                (findProperty("weare.pacote") as String?)?.let { base -> it.defaultConfig.applicationId = base }
+             }
+ 
+             onVariants { variant ->
+diff --git a/src/pt/mangadash/build.gradle.kts b/src/pt/mangadash/build.gradle.kts
+index 1db9c1ce..d06226b4 100644
+--- a/src/pt/mangadash/build.gradle.kts
++++ b/src/pt/mangadash/build.gradle.kts
+@@ -6,7 +6,7 @@ plugins {
+ 
+ keiyoushi {
+     name = "MangaDash"
+-    versionCode = 0
++    versionCode = 1
+     contentWarning = ContentWarning.MIXED
+     libVersion = "1.6"
+ 
+diff --git a/src/pt/mangadash/src/eu/kanade/tachiyomi/extension/pt/mangadash/MangaDash.kt b/src/pt/mangadash/src/eu/kanade/tachiyomi/extension/pt/mangadash/MangaDash.kt
+index 870fb232..72e8b60b 100644
+--- a/src/pt/mangadash/src/eu/kanade/tachiyomi/extension/pt/mangadash/MangaDash.kt
++++ b/src/pt/mangadash/src/eu/kanade/tachiyomi/extension/pt/mangadash/MangaDash.kt
+@@ -276,8 +276,13 @@ abstract class MangaDash :
+ 
+     // ============================== Details ==============================
+     private fun mangaDetailsParse(document: Document) = SManga.create().apply {
++        // Obra +18 sem sessão: o site redireciona para o login em vez de mostrar a obra.
++        if (document.location().contains("/auth/login")) {
++            throw Exception("Obra +18: informe usuário e senha nas configurações da extensão (e habilite +18 no perfil do site).")
++        }
+         setUrlWithoutDomain(document.location())
+-        title = document.selectFirst(".neon-title")?.text()!!
++        title = document.selectFirst(".neon-title")?.text()
++            ?: throw Exception("Página da obra mudou: título não encontrado.")
+         thumbnail_url = document.selectFirst(".cover-3d img")?.attr("abs:src")
+         author = document.selectFirst(".tag-author")?.text()
+         genre = document.select(".manga-tags a.tag:not(.tag-author)").joinToString { it.text() }
+@@ -323,6 +328,10 @@ abstract class MangaDash :
+ 
+         var pdfUrl = dto.resolvedPdfUrl
+         if (!pdfUrl.isNullOrBlank()) {
++            // PdfRenderer só existe no Android; no servidor do Windows (Suwayomi) a classe é um stub.
++            if (System.getProperty("java.vendor")?.contains("Android", ignoreCase = true) != true) {
++                throw Exception("Este capítulo é um PDF e só abre no WeAre! para Android.")
++            }
+             pdfUrl = pdfUrl.replace(" ", "%20")
+             if (pdfUrl.startsWith("/")) {
+                 pdfUrl = baseUrl + pdfUrl

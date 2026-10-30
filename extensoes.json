@@ -1,0 +1,21 @@
+[
+  {
+    "name": "MangaDash",
+    "pkg": "app.weare.extension.pt.mangadash",
+    "lib": "1.6",
+    "versionCode": 106001,
+    "versionName": "1.6.1",
+    "contentWarning": 2,
+    "apk": "weare-pt.mangadash-v1.6.1.apk",
+    "jar": "weare-pt.mangadash-v1.6.1.jar",
+    "icon": "app.weare.extension.pt.mangadash.png",
+    "sources": [
+      {
+        "id": "4579000402227688678",
+        "name": "MangaDash",
+        "lang": "pt-BR",
+        "homeUrl": "https://mangadash.net"
+      }
+    ]
+  }
+]

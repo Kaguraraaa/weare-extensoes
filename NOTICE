@@ -1,0 +1,11 @@
+WeAre! extensions
+
+This repository contains binaries built from a modified copy of
+keiyoushi/extensions-source (https://github.com/keiyoushi/extensions-source),
+commit dbf6c05d6a9520c60533f1626616263522bbe71a, licensed under the Apache License 2.0.
+
+Modifications (see alteracoes/weare-sobre-keiyoushi-dbf6c05.diff):
+- build: optional application id prefix (app.weare.extension) for a separate signing key;
+- MangaDash: clear error messages for 18+ titles without login and for PDF chapters on Suwayomi.
+
+Personal-use project; not affiliated with Keiyoushi, Mihon, Suwayomi or any source website.
